@@ -1,0 +1,13 @@
+purchase = load '$dir/purchase.csv' using PigStorage(',') as (item:int,buyer:chararray,quant:int);
+detail = load '$dir/item1.csv' using PigStorage(',') as (itemid:int,desc:chararray,price:double);
+mix = JOIN purchase by item, detail by itemid;
+grouped = group mix by purchase::buyer;
+describe grouped;
+itemized = foreach grouped {
+	expend = foreach mix generate (price*quant);
+	generate group as buyer, SUM(mix.purchase::quant) as items, SUM(expend) as expenditure;
+};
+extravagant = limit (order itemized by expenditure DESC) 1;
+dump extravagant;
+
+

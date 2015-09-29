@@ -1,0 +1,8 @@
+a = load '$dir/transaction.csv' using PigStorage(',') as (person:chararray,store:chararray,spent:float);
+tr = foreach (group a by ($1,$0)) generate group.$0 , SUM(a.$2);
+dump tr;
+describe tr;
+st = foreach (group tr by $0) generate group, COUNT(tr), SUM(tr.$1);
+describe st;
+dump st;
+
